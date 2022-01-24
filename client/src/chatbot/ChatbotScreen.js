@@ -74,15 +74,17 @@ function ChatbotScreen() {
         "api/dialogflow/eventQuery",
         eventQueryVariables
       );
-      const content = response.data.fulfillmentMessages[0];
 
-      let conversation = {
-        who: "bot",
-        content: content,
-      };
+      // 받은 메세지 전부 가공
+      for (let content of response.data.fulfillmentMessages) {
+        let conversation = {
+          who: "bot",
+          content: content,
+        };
 
-      // 챗봇으로 부터 받은 메세지 리덕스에 저장
-      dispacth(saveMessage(conversation));
+        // 챗봇으로 부터 받은 메세지 리덕스에 저장
+        dispacth(saveMessage(conversation));
+      }
     } catch (err) {
       let conversation = {
         who: "bot",

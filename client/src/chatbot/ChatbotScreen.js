@@ -1,7 +1,12 @@
 import Axios from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 
 function ChatbotScreen() {
+  useEffect(() => {
+    eventQuery("welcomeToMyWebsite");
+  }, []);
+
+  // text query
   const textQuery = async (text) => {
     // 1. 사용자가 입력한 메세지 처리
     let conversation = {
@@ -16,6 +21,7 @@ function ChatbotScreen() {
     const textQueryVariables = {
       text,
     };
+
     // 2. 챗봇이 보낸 메세지 처리
     try {
       // textQuery Rout에 메세지 보내기
@@ -32,6 +38,39 @@ function ChatbotScreen() {
       console.log(conversation);
     } catch (err) {
       conversation = {
+        who: "bot",
+        content: {
+          text: {
+            text: " Error just occured, please check the problem",
+          },
+        },
+      };
+      console.log(conversation);
+    }
+  };
+
+  // event query
+  const eventQuery = async (event) => {
+    const eventQueryVariables = {
+      event,
+    };
+
+    // dialogflow로부터 받은 메세지 처리
+    try {
+      // textQuery Rout에 메세지 보내기
+      const response = await Axios.post(
+        "api/dialogflow/eventQuery",
+        eventQueryVariables
+      );
+      const content = response.data.fulfillmentMessages[0];
+
+      let conversation = {
+        who: "bot",
+        content: content,
+      };
+      console.log(conversation);
+    } catch (err) {
+      let conversation = {
         who: "bot",
         content: {
           text: {

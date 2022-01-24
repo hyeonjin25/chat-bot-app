@@ -1,7 +1,13 @@
 import Axios from "axios";
 import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { saveMessage } from "../_actions/message_actions";
+import Message from "./Section/Message";
 
 function ChatbotScreen() {
+  const dispacth = useDispatch();
+  const messagesFromRedux = useSelector((state) => state.message.messages);
+
   useEffect(() => {
     eventQuery("welcomeToMyWebsite");
   }, []);
@@ -17,6 +23,9 @@ function ChatbotScreen() {
         },
       },
     };
+
+    // 사용자가 입력한 메세지 리덕스에 저장
+    dispacth(saveMessage(conversation));
 
     const textQueryVariables = {
       text,
@@ -35,7 +44,9 @@ function ChatbotScreen() {
         who: "bot",
         content: content,
       };
-      console.log(conversation);
+
+      // 챗봇으로 부터 받은 메세지 리덕스에 저장
+      dispacth(saveMessage(conversation));
     } catch (err) {
       conversation = {
         who: "bot",
@@ -45,7 +56,8 @@ function ChatbotScreen() {
           },
         },
       };
-      console.log(conversation);
+      // 챗봇으로 부터 받은 메세지 리덕스에 저장
+      dispacth(saveMessage(conversation));
     }
   };
 
@@ -68,7 +80,9 @@ function ChatbotScreen() {
         who: "bot",
         content: content,
       };
-      console.log(conversation);
+
+      // 챗봇으로 부터 받은 메세지 리덕스에 저장
+      dispacth(saveMessage(conversation));
     } catch (err) {
       let conversation = {
         who: "bot",
@@ -78,7 +92,8 @@ function ChatbotScreen() {
           },
         },
       };
-      console.log(conversation);
+      // 챗봇으로 부터 받은 메세지 리덕스에 저장
+      dispacth(saveMessage(conversation));
     }
   };
 
@@ -95,6 +110,22 @@ function ChatbotScreen() {
     }
   };
 
+  const renderOneMessage = (message, i) => {
+    return (
+      <Message key={i} who={message.who} text={message.content.text.text} />
+    );
+  };
+
+  const renderMessage = (returnedMessages) => {
+    if (returnedMessages) {
+      return returnedMessages.map((message, i) => {
+        return renderOneMessage(message, i);
+      });
+    } else {
+      return null;
+    }
+  };
+
   return (
     <div
       style={{
@@ -104,7 +135,9 @@ function ChatbotScreen() {
         borderRadius: "7px",
       }}
     >
-      <div style={{ height: 644, width: "100%", overflow: "auto" }}></div>
+      <div style={{ height: 644, width: "100%", overflow: "auto" }}>
+        {renderMessage(messagesFromRedux)}
+      </div>
       <input
         style={{
           margin: 0,

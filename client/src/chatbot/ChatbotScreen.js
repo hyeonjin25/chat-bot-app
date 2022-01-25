@@ -3,6 +3,8 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { saveMessage } from "../_actions/message_actions";
 import Message from "./Section/Message";
+import CardComponent from "./Section/Card";
+import { List, Icon, Avatar } from "antd";
 
 function ChatbotScreen() {
   const dispacth = useDispatch();
@@ -47,6 +49,7 @@ function ChatbotScreen() {
 
         // 챗봇으로 부터 받은 메세지 리덕스에 저장
         dispacth(saveMessage(conversation));
+        console.log(conversation);
       }
     } catch (err) {
       conversation = {
@@ -113,10 +116,43 @@ function ChatbotScreen() {
     }
   };
 
+  const renderCards = (cards) => {
+    return cards.map((card, i) => (
+      <CardComponent key={i} cardInfo={card.structValue} />
+    ));
+  };
+
   const renderOneMessage = (message, i) => {
-    return (
-      <Message key={i} who={message.who} text={message.content.text.text} />
-    );
+    // 다른 종류의 메세지를 위한 조건문
+    // normal text
+    if (message.content && message.content.text && message.content.text.text) {
+      return (
+        <Message key={i} who={message.who} text={message.content.text.text} />
+      );
+    }
+    // card message
+    else if (
+      message.content &&
+      message.content.payload &&
+      message.content.payload.fields.card
+    ) {
+      // 챗봇과 사람 아이콘 달라지도록 만들기
+      const AvatarSrc =
+        message.who === "bot" ? <Icon type='robot' /> : <Icon type='smile' />;
+      return (
+        <div>
+          <List.Item key={message.i} style={{ padding: "1rem" }}>
+            <List.Item.Meta
+              avatar={<Avatar icon={AvatarSrc} />}
+              title={message.who}
+              description={renderCards(
+                message.content.payload.fields.card.listValue.values
+              )}
+            />
+          </List.Item>
+        </div>
+      );
+    }
   };
 
   const renderMessage = (returnedMessages) => {

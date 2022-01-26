@@ -30,3 +30,10 @@ body {
   color: black !important;
 }
 
+.ant-list-item-meta-content {
+  overflow-x: visible;
+}
+
+.ant-list-item-meta-description {
+  display: block;
+}
